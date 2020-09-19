@@ -16,7 +16,7 @@ const pool = sql.createPool({
 });
 
 // POST USER
-app.post("/user", async (req, resp) => {
+app.post("/user", authorizeUser, async (req, resp) => {
   try {
     if (!req.body.username) {
       resp.status(400).send({ message: "no username entered" });
@@ -37,5 +37,9 @@ app.post("/user", async (req, resp) => {
     resp.status(500).send({ message: error });
   }
 });
+
+function authorizeUser(req, resp, next) {
+  next();
+}
 
 app.listen(PORT, () => console.log(`server is runing on port ${PORT}`));
