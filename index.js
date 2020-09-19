@@ -31,7 +31,36 @@ app.post("/user", authorizeUser, async (req, resp) => {
       ]
     );
     conn.release();
-    resp.status(200).send({ mennsage: queryResponse });
+    resp.status(200).send({ message: queryResponse });
+  } catch (error) {
+    console.log(error);
+    resp.status(500).send({ message: error });
+  }
+});
+
+app.get("/users", authorizeUser, async (req, resp) => {
+  try {
+    const conn = await pool.getConnection();
+    const recordset = await conn.query("SELECT * FROM rentalapp.user");
+    conn.release();
+    console.log(recordset[0]);
+    resp.status(200).send({ message: recordset[0] });
+  } catch (error) {
+    console.log(error);
+    resp.status(500).send({ message: error });
+  }
+});
+
+app.get("/user", authorizeUser, async (req, resp) => {
+  try {
+    const conn = await pool.getConnection();
+    const recordset = await conn.execute(
+      "SELECT * FROM rentalapp.user WHERE username = ?",
+      [req.query.username]
+    );
+    conn.release();
+    console.log(recordset[0]);
+    resp.status(200).send({ message: recordset[0] });
   } catch (error) {
     console.log(error);
     resp.status(500).send({ message: error });
