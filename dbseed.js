@@ -25,7 +25,7 @@ const pool = sql.createPool({
 //     conn.query("USE rentalapp");
 
 //     const userDb = await conn.query(
-//       "CREATE TABLE IF NOT EXISTS user (username VARCHAR(255) UNIQUE NOT NULL, firstName VARCHAR(255) NOT NULL, lastName VARCHAR(255) NOT NULL, PRIMARY KEY(username) )"
+//       "CREATE TABLE IF NOT EXISTS user (username VARCHAR(255) UNIQUE NOT NULL, firstName VARCHAR(255), lastName VARCHAR(255), PRIMARY KEY(username) )"
 //     );
 //     console.log(userDb);
 
