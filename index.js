@@ -118,6 +118,123 @@ app.delete("/user", authorizeUser, async (req, resp) => {
   }
 });
 
+// POST CARD
+app.post("/card", authorizeUser, async (req, resp) => {
+  try {
+    if (
+      !req.body.username ||
+      !req.body.title ||
+      !req.body.description ||
+      !req.body.rentcost
+    ) {
+      return response
+        .status(400)
+        .send({ message: "Enter All Required Information" });
+    }
+    const conn = await pool.getConnection();
+    const queryResponse = await conn.execute(
+      "INSERT INTO rentalapp.cards (username, title, description, rentcost, date) VALUES (?,?,?,?,?)",
+      [
+        req.body.username,
+        req.body.title,
+        req.body.description,
+        req.body.rentcost,
+        new Date(),
+      ]
+    );
+    conn.release();
+    console.log(queryResponse);
+    resp.status(200).send({ message: queryResponse });
+  } catch (error) {
+    console.log(error);
+    resp.status(500).send({ message: error });
+  }
+});
+
+// GET ALL CARDS
+app.get("/cards", authorizeUser, async (req, resp) => {
+  try {
+    const conn = await pool.getConnection();
+    const recordset = await conn.query("SELECT * FROM rentalapp.cards");
+    // const recordset = await conn.query(
+    //   "SELECT * FROM rentalapp.user users JOIN rentalapp.cards cards ON users.username = cards.username"
+    // );
+    conn.release();
+    console.log(recordset[0]);
+    resp.status(200).send({ message: recordset[0] });
+  } catch (error) {
+    console.log(error);
+    resp.status(500).send({ message: error });
+  }
+});
+
+// GET ONE CARD
+app.get("/card", authorizeUser, async (req, resp) => {
+  try {
+    const conn = await pool.getConnection();
+    const recordset = await conn.execute(
+      "SELECT * FROM rentalapp.cards WHERE id = ?",
+      [req.query.cardid]
+    );
+    conn.release();
+    console.log(recordset[0]);
+    resp.status(200).send({ message: recordset[0] });
+  } catch (error) {
+    console.log(error);
+    resp.status(500).send({ message: error });
+  }
+});
+
+// MODIFY CARD
+app.put("/card", authorizeUser, async (req, resp) => {
+  try {
+    if (!req.body.cardid) {
+      resp.status(400).send({ message: "no valid id entered" });
+    }
+
+    const selectQuery = await pool.execute(
+      "SELECT * FROM rentalapp.cards WHERE id = ?",
+      [req.body.cardid]
+    );
+
+    const selectedCard = selectQuery[0][0];
+
+    const conn = await pool.getConnection();
+    const queryResponse = await conn.execute(
+      "UPDATE rentalapp.cards SET title = ?, description = ?, rentcost = ?, date = ? WHERE id = ?",
+      [
+        req.body.title ? req.body.title : selectedCard.title,
+        req.body.description ? req.body.description : selectedCard.description,
+        req.body.rentcost ? req.body.rentcost : selectedCard.rentcost,
+        new Date(),
+        req.body.cardid,
+      ]
+    );
+    conn.release();
+    resp.status(200).send({ message: queryResponse });
+  } catch (error) {
+    console.log(error);
+    resp.status(500).send({ message: error });
+  }
+});
+
+// DELETE CARD
+app.delete("/card", authorizeUser, async (req, resp) => {
+  try {
+    const conn = await pool.getConnection();
+    const recordset = await conn.execute(
+      "DELETE FROM rentalapp.cards WHERE id = ?",
+      [req.body.cardid]
+    );
+    conn.release();
+    console.log(recordset[0]);
+    resp.status(200).send({ message: recordset[0] });
+  } catch (error) {
+    console.log(error);
+    resp.status(500).send({ message: error });
+  }
+});
+
 function authorizeUser(req, resp, next) {
   next();
 }

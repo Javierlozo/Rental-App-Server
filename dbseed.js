@@ -17,6 +17,7 @@ const pool = sql.createPool({
 //   }
 // })();
 
+// USER TABLE
 // (async function createUserTable() {
 //   try {
 //     const conn = await pool.getConnection();
@@ -35,6 +36,7 @@ const pool = sql.createPool({
 //   }
 // })();
 
+// SURFBOARD TABLE (NOT USED)
 // (async function createCardSurfboardsTable() {
 //   try {
 //     const conn = await pool.getConnection();
@@ -52,6 +54,7 @@ const pool = sql.createPool({
 //   }
 // })();
 
+// KAYAK TABLE (NOT USED)
 // (async function createCardKayaksTable() {
 //   try {
 //     const conn = await pool.getConnection();
@@ -67,6 +70,7 @@ const pool = sql.createPool({
 //   }
 // })();
 
+// BIKES TABLE (NOT USED)
 // (async function createCardBikesTable() {
 //   try {
 //     const conn = await pool.getConnection();
@@ -82,6 +86,7 @@ const pool = sql.createPool({
 //   }
 // })();
 
+// CARDS TABLE
 // (async function createCardsTable() {
 //   try {
 //     const conn = await pool.getConnection();
@@ -89,7 +94,7 @@ const pool = sql.createPool({
 //     conn.query("USE rentalapp");
 
 //     const cardsDb = await conn.query(
-//       "CREATE TABLE IF NOT EXISTS cards (id INT UNIQUE NOT NULL AUTO_INCREMENT, title VARCHAR(255), description VARCHAR(255), rentcost VARCHAR(255), username VARCHAR(255) NOT NULL, date DATETIME NOT NULL, PRIMARY KEY(id), FOREIGN KEY(username) REFERENCES user(username))"
+//       "CREATE TABLE IF NOT EXISTS cards (id INT UNIQUE NOT NULL AUTO_INCREMENT, title VARCHAR(255) NOT NULL, description VARCHAR(255) NOT NULL, rentcost VARCHAR(255) NOT NULL, username VARCHAR(255) NOT NULL, date DATETIME NOT NULL, PRIMARY KEY(id), FOREIGN KEY(username) REFERENCES user(username))"
 //     );
 //     console.log(cardsDb);
 //   } catch (error) {
@@ -97,6 +102,7 @@ const pool = sql.createPool({
 //   }
 // })();
 
+// PICS TABLE
 // (async function createPicsTable() {
 //   try {
 //     const conn = await pool.getConnection();
