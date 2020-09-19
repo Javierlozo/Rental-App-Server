@@ -117,3 +117,20 @@ const pool = sql.createPool({
 //     console.log(error);
 //   }
 // })();
+
+// MESSAGE TABLE
+(async function createMessageTable() {
+  try {
+    const conn = await pool.getConnection();
+
+    conn.query("USE rentalapp");
+
+    const messageDb = await conn.query(
+      "CREATE TABLE IF NOT EXISTS message (id INT UNIQUE NOT NULL AUTO_INCREMENT, username VARCHAR(255), tousername VARCHAR(255) NOT NULL, date VARCHAR(255), msgsubject VARCHAR(255) NOT NULL, msgbody VARCHAR(4000) NOT NULL, PRIMARY KEY(id), FOREIGN KEY(username) REFERENCES user(username))"
+    );
+    console.log(messageDb);
+    conn.release();
+  } catch (error) {
+    console.log(error);
+  }
+})();
