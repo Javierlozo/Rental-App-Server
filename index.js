@@ -38,6 +38,7 @@ app.post("/user", authorizeUser, async (req, resp) => {
   }
 });
 
+// GET USERS
 app.get("/users", authorizeUser, async (req, resp) => {
   try {
     const conn = await pool.getConnection();
@@ -51,6 +52,7 @@ app.get("/users", authorizeUser, async (req, resp) => {
   }
 });
 
+// GET ONE USER
 app.get("/user", authorizeUser, async (req, resp) => {
   try {
     const conn = await pool.getConnection();
@@ -61,6 +63,70 @@ app.get("/user", authorizeUser, async (req, resp) => {
     conn.release();
     console.log(recordset[0]);
     resp.status(200).send({ message: recordset[0] });
+  } catch (error) {
+    console.log(error);
+    resp.status(500).send({ message: error });
+  }
+});
+
+// MODIFY USER
+app.put("/user", authorizeUser, async (req, resp) => {
+  try {
+    if (!req.body.username) {
+      resp.status(400).send({ message: "no username entered" });
+    }
+
+    const selectQuery = await pool.execute(
+      "SELECT * FROM rentalapp.user WHERE username = ?",
+      [req.body.username]
+    );
+
+    const selectedUser = selectQuery[0][0];
+
+    const conn = await pool.getConnection();
+    const queryResponse = await conn.execute(
+      "UPDATE rentalapp.user SET username = ?, firstName = ?, lastName = ? WHERE username = ?",
+      [
+        req.body.username,
+        req.body.firstName ? req.body.firstName : selectedUser.firstName,
+        req.body.lastName ? req.body.lastName : selectedUser.lastName,
+        req.body.username,
+      ]
+    );
+    conn.release();
+    resp.status(200).send({ message: queryResponse });
+  } catch (error) {
+    console.log(error);
+    resp.status(500).send({ message: error });
+  }
+});
+
+// DELETE USER
+app.put("/user", authorizeUser, async (req, resp) => {
+  try {
+    if (!req.body.username) {
+      resp.status(400).send({ message: "no username entered" });
+    }
+
+    const selectQuery = await pool.execute(
+      "SELECT * FROM rentalapp.user WHERE username = ?",
+      [req.body.username]
+    );
+
+    const selectedUser = selectQuery[0][0];
+
+    const conn = await pool.getConnection();
+    const queryResponse = await conn.execute(
+      "UPDATE rentalapp.user SET username = ?, firstName = ?, lastName = ? WHERE username = ?",
+      [
+        req.body.username,
+        req.body.firstName ? req.body.firstName : selectedUser.firstName,
+        req.body.lastName ? req.body.lastName : selectedUser.lastName,
+        req.body.username,
+      ]
+    );
+    conn.release();
+    resp.status(200).send({ message: queryResponse });
   } catch (error) {
     console.log(error);
     resp.status(500).send({ message: error });
