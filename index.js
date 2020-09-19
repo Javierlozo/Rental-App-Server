@@ -124,21 +124,20 @@ app.post("/card", authorizeUser, async (req, resp) => {
     if (
       !req.body.username ||
       !req.body.title ||
-      !req.body.description ||
-      !req.body.rentcost
+      !req.body.rentcost ||
+      !req.body.s3uuid
     ) {
-      return response
-        .status(400)
-        .send({ message: "Enter All Required Information" });
+      resp.status(400).send({ message: "Enter All Required Information" });
     }
     const conn = await pool.getConnection();
     const queryResponse = await conn.execute(
-      "INSERT INTO rentalapp.cards (username, title, description, rentcost, date) VALUES (?,?,?,?,?)",
+      "INSERT INTO rentalapp.cards (username, title, description, rentcost, s3uuid, date) VALUES (?,?,?,?,?,?)",
       [
         req.body.username,
         req.body.title,
         req.body.description,
         req.body.rentcost,
+        req.body.s3uuid,
         new Date(),
       ]
     );
@@ -201,11 +200,12 @@ app.put("/card", authorizeUser, async (req, resp) => {
 
     const conn = await pool.getConnection();
     const queryResponse = await conn.execute(
-      "UPDATE rentalapp.cards SET title = ?, description = ?, rentcost = ?, date = ? WHERE id = ?",
+      "UPDATE rentalapp.cards SET title = ?, description = ?, rentcost = ?, s3uuid = ?, date = ? WHERE id = ?",
       [
         req.body.title ? req.body.title : selectedCard.title,
         req.body.description ? req.body.description : selectedCard.description,
         req.body.rentcost ? req.body.rentcost : selectedCard.rentcost,
+        req.body.s3uuid ? req.body.s3uuid : selectedCard.s3uuid,
         new Date(),
         req.body.cardid,
       ]

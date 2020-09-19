@@ -94,7 +94,7 @@ const pool = sql.createPool({
 //     conn.query("USE rentalapp");
 
 //     const cardsDb = await conn.query(
-//       "CREATE TABLE IF NOT EXISTS cards (id INT UNIQUE NOT NULL AUTO_INCREMENT, title VARCHAR(255) NOT NULL, description VARCHAR(255) NOT NULL, rentcost VARCHAR(255) NOT NULL, username VARCHAR(255) NOT NULL, date DATETIME NOT NULL, PRIMARY KEY(id), FOREIGN KEY(username) REFERENCES user(username))"
+//       "CREATE TABLE IF NOT EXISTS cards (id INT UNIQUE NOT NULL AUTO_INCREMENT, title VARCHAR(255) NOT NULL, description VARCHAR(255), rentcost VARCHAR(255) NOT NULL, username VARCHAR(255) NOT NULL, s3uuid VARCHAR(255) NOT NULL UNIQUE, date DATETIME NOT NULL, PRIMARY KEY(id), FOREIGN KEY(username) REFERENCES user(username))"
 //     );
 //     console.log(cardsDb);
 //   } catch (error) {
@@ -102,7 +102,7 @@ const pool = sql.createPool({
 //   }
 // })();
 
-// PICS TABLE
+// PICS TABLE (NOT USED)
 // (async function createPicsTable() {
 //   try {
 //     const conn = await pool.getConnection();
