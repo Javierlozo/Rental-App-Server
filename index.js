@@ -102,31 +102,16 @@ app.put("/user", authorizeUser, async (req, resp) => {
 });
 
 // DELETE USER
-app.put("/user", authorizeUser, async (req, resp) => {
+app.delete("/user", authorizeUser, async (req, resp) => {
   try {
-    if (!req.body.username) {
-      resp.status(400).send({ message: "no username entered" });
-    }
-
-    const selectQuery = await pool.execute(
-      "SELECT * FROM rentalapp.user WHERE username = ?",
+    const conn = await pool.getConnection();
+    const recordset = await conn.execute(
+      "DELETE FROM rentalapp.user WHERE username = ?",
       [req.body.username]
     );
-
-    const selectedUser = selectQuery[0][0];
-
-    const conn = await pool.getConnection();
-    const queryResponse = await conn.execute(
-      "UPDATE rentalapp.user SET username = ?, firstName = ?, lastName = ? WHERE username = ?",
-      [
-        req.body.username,
-        req.body.firstName ? req.body.firstName : selectedUser.firstName,
-        req.body.lastName ? req.body.lastName : selectedUser.lastName,
-        req.body.username,
-      ]
-    );
     conn.release();
-    resp.status(200).send({ message: queryResponse });
+    console.log(recordset[0]);
+    resp.status(200).send({ message: recordset[0] });
   } catch (error) {
     console.log(error);
     resp.status(500).send({ message: error });
