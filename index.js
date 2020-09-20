@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const sql = require("mysql2/promise");
 const cors = require("cors");
-const { response } = require("express");
+const { resp } = require("express");
 
 const PORT = 4000;
 const app = express();
@@ -19,7 +19,7 @@ const pool = sql.createPool({
 app.post("/user", authorizeUser, async (req, resp) => {
   try {
     if (!req.body.username) {
-      resp.status(400).send({ message: "no username entered" });
+      resp.status(400).send({ message: "No username entered" });
     }
     const conn = await pool.getConnection();
     const queryResponse = await conn.execute(
@@ -188,7 +188,7 @@ app.get("/card", authorizeUser, async (req, resp) => {
 app.put("/card", authorizeUser, async (req, resp) => {
   try {
     if (!req.body.cardid) {
-      resp.status(400).send({ message: "no valid id entered" });
+      resp.status(400).send({ message: "No valid id entered" });
     }
 
     const selectQuery = await pool.execute(
@@ -225,6 +225,112 @@ app.delete("/card", authorizeUser, async (req, resp) => {
     const recordset = await conn.execute(
       "DELETE FROM rentalapp.cards WHERE id = ?",
       [req.body.cardid]
+    );
+    conn.release();
+    console.log(recordset[0]);
+    resp.status(200).send({ message: recordset[0] });
+  } catch (error) {
+    console.log(error);
+    resp.status(500).send({ message: error });
+  }
+});
+
+// POST MESSAGE
+app.post("/message", authorizeUser, async (req, resp) => {
+  try {
+    const conn = await pool.getConnection();
+    const queryResponse = await conn.execute(
+      "INSERT INTO rentalapp.message (username, tousername, date, msgsubject, msgbody) VALUES ( ?, ?, ?, ?, ?)",
+      [
+        req.body.username,
+        req.body.tousername ? req.body.tousername : null,
+        new Date(),
+        req.body.msgsubject ? req.body.msgsubject : null,
+        req.body.msgbody ? req.body.msgbody : null,
+      ]
+    );
+    conn.release();
+    console.log(queryResponse);
+    resp.status(200).send({ message: queryResponse });
+  } catch (error) {
+    console.log(error);
+    resp.status(500).send({ message: error });
+  }
+});
+
+// GET ALL MESSAGES
+app.get("/messages", authorizeUser, async (req, resp) => {
+  try {
+    const conn = await pool.getConnection();
+    const recordset = await conn.query("SELECT * FROM rentalapp.message");
+
+    conn.release();
+    console.log(recordset[0]);
+    resp.status(200).send({ message: recordset[0] });
+  } catch (error) {
+    console.log(error);
+    resp.status(500).send({ message: error });
+  }
+});
+
+// GET ONE MESSAGE
+app.get("/message", authorizeUser, async (req, resp) => {
+  try {
+    const conn = await pool.getConnection();
+    const recordset = await conn.execute(
+      "SELECT * FROM rentalapp.message WHERE id = ?",
+      [req.query.messageid]
+    );
+    conn.release();
+    console.log(recordset[0]);
+    resp.status(200).send({ message: recordset[0] });
+  } catch (error) {
+    console.log(error);
+    resp.status(500).send({ message: error });
+  }
+});
+
+// MODIFY MESSAGE
+app.put("/message", authorizeUser, async (req, resp) => {
+  try {
+    if (!req.body.messageid) {
+      resp.status(400).send({ message: "No valid id entered" });
+    }
+
+    const selectQuery = await pool.execute(
+      "SELECT * FROM rentalapp.message WHERE id = ?",
+      [req.body.messageid]
+    );
+
+    const selectedMessage = selectQuery[0][0];
+
+    const conn = await pool.getConnection();
+    const queryResponse = await conn.execute(
+      "UPDATE rentalapp.message SET username = ?, tousername = ?, date = ? , msgsubject = ?, msgbody = ? WHERE id = ?",
+      [
+        req.body.username,
+        req.body.tousername ? req.body.tousername : selectedMessage.tousername,
+        new Date(),
+        req.body.msgsubject ? req.body.msgsubject : selectedMessage.msgsubject,
+        req.body.msgbody ? req.body.msgbody : selectedMessage.msgbody,
+        req.body.messageid,
+      ]
+    );
+    conn.release();
+    resp.status(200).send({ message: queryResponse });
+  } catch (error) {
+    console.log(error);
+    resp.status(500).send({ message: error });
+  }
+});
+
+// DELETE MESSAGE
+app.delete("/message", authorizeUser, async (req, resp) => {
+  try {
+    const conn = await pool.getConnection();
+    const recordset = await conn.execute(
+      "DELETE FROM rentalapp.message WHERE id = ?",
+      [req.body.messageid]
     );
     conn.release();
     console.log(recordset[0]);
